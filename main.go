@@ -25,7 +25,7 @@ func info() BattlesnakeInfoResponse {
 
 	return BattlesnakeInfoResponse{
 		APIVersion: "1",
-		Author:     "",        // TODO: Your Battlesnake username
+		Author:     "magikid", // TODO: Your Battlesnake username
 		Color:      "#888888", // TODO: Choose color
 		Head:       "default", // TODO: Choose head
 		Tail:       "default", // TODO: Choose tail
@@ -72,14 +72,86 @@ func move(state GameState) BattlesnakeMoveResponse {
 	}
 
 	// TODO: Step 1 - Prevent your Battlesnake from moving out of bounds
-	// boardWidth := state.Board.Width
-	// boardHeight := state.Board.Height
+	boardWidth := state.Board.Width
+	boardHeight := state.Board.Height
+	if myHead.X == 0 {
+		isMoveSafe["left"] = false
+	} else if myHead.X == boardWidth-1 {
+		isMoveSafe["right"] = false
+	} else if myHead.Y == 0 {
+		isMoveSafe["down"] = false
+	} else if myHead.Y == boardHeight-1 {
+		isMoveSafe["up"] = false
+	}
 
 	// TODO: Step 2 - Prevent your Battlesnake from colliding with itself
-	// mybody := state.You.Body
+	mybody := state.You.Body
+	for i := 1; i < len(mybody); i++ {
+		if mybody[i].X == myHead.X && mybody[i].Y == myHead.Y {
+			switch mybody[i].X {
+			case myHead.X - 1:
+				isMoveSafe["left"] = false
+			case myHead.X + 1:
+				isMoveSafe["right"] = false
+			case myHead.Y - 1:
+				isMoveSafe["down"] = false
+			case myHead.Y + 1:
+				isMoveSafe["up"] = false
+			}
+		}
+	}
 
 	// TODO: Step 3 - Prevent your Battlesnake from colliding with other Battlesnakes
-	// opponents := state.Board.Snakes
+	opponents := state.Board.Snakes
+	for _, opponent := range opponents {
+		if opponent.ID == state.You.ID {
+			continue
+		}
+		for i := 0; i < len(opponent.Body); i++ {
+			if opponent.Body[i].X == myHead.X && opponent.Body[i].Y == myHead.Y {
+				switch opponent.Body[i].X {
+				case myHead.X - 1:
+					isMoveSafe["left"] = false
+				case myHead.X + 1:
+					isMoveSafe["right"] = false
+				case myHead.Y - 1:
+					isMoveSafe["down"] = false
+				case myHead.Y + 1:
+					isMoveSafe["up"] = false
+				}
+			}
+			// Check if the opponent is in the same row or column as the head
+			if opponent.Body[i].X == myHead.X {
+				if opponent.Body[i].Y < myHead.Y {
+					// Opponent is above the head
+					if myHead.Y-opponent.Body[i].Y < 2 {
+						// If the opponent is too close, don't move up
+						isMoveSafe["up"] = false
+					}
+				} else if opponent.Body[i].Y > myHead.Y {
+					// Opponent is below the head
+					if opponent.Body[i].Y-myHead.Y < 2 {
+						// If the opponent is too close, don't move down
+						isMoveSafe["down"] = false
+					}
+				}
+			} else if opponent.Body[i].Y == myHead.Y {
+				if opponent.Body[i].X < myHead.X {
+					// Opponent is left of the head
+					if myHead.X-opponent.Body[i].X < 2 {
+						// If the opponent is too close, don't move left
+						isMoveSafe["left"] = false
+					}
+				} else if opponent.Body[i].X > myHead.X {
+					// Opponent is right of the head
+					if opponent.Body[i].X-myHead.X < 2 {
+						// If the opponent is too close, don't move right
+						isMoveSafe["right"] = false
+					}
+				}
+			}
+		}
+	}
 
 	// Are there any safe moves left?
 	safeMoves := []string{}
@@ -98,7 +170,34 @@ func move(state GameState) BattlesnakeMoveResponse {
 	nextMove := safeMoves[rand.Intn(len(safeMoves))]
 
 	// TODO: Step 4 - Move towards food instead of random, to regain health and survive longer
-	// food := state.Board.Food
+	food := state.Board.Food
+	if len(food) > 0 {
+		closestFood := food[0]
+		for _, f := range food {
+			if (myHead.X-closestFood.X)*(myHead.X-closestFood.X)+(myHead.Y-closestFood.Y)*(myHead.Y-closestFood.Y) >
+				(myHead.X-f.X)*(myHead.X-f.X)+(myHead.Y-f.Y)*(myHead.Y-f.Y) {
+				closestFood = f
+			}
+		}
+		if closestFood.X < myHead.X {
+			if isMoveSafe["left"] {
+				nextMove = "left"
+			}
+		} else if closestFood.X > myHead.X {
+			if isMoveSafe["right"] {
+				nextMove = "right"
+			}
+		} else if closestFood.Y < myHead.Y {
+			if isMoveSafe["up"] {
+				nextMove = "up"
+			}
+		} else if closestFood.Y > myHead.Y {
+			if isMoveSafe["down"] {
+				nextMove = "down"
+			}
+		}
+	}
+	// Log the move
 
 	log.Printf("MOVE %d: %s\n", state.Turn, nextMove)
 	return BattlesnakeMoveResponse{Move: nextMove}

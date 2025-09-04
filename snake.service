@@ -1,0 +1,13 @@
+[Unit]
+Description=Battlesnake runner
+After=network.target
+
+[Service]
+Environment=PORT=80
+ExecStart=/root/snakes/snake
+Type=simple
+Restart=always
+
+[Install]
+WantedBy=default.target
+RequiredBy=network.target

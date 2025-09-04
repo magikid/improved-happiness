@@ -1,0 +1,10 @@
+build:
+  stage: build
+  script:
+    - just build
+
+deploy-prod:
+  stage: deploy
+  script:
+    - just deploy
+  environment: production

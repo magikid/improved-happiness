@@ -2,7 +2,7 @@ build:
     GOOS=linux GOARCH=amd64 go build -o snake-${CI_COMMIT_SHORT_SHA} .
 
 deploy: build
-    scp snake.service /etc/systemd/system/snake.service
+    scp snake.service root@45.32.186.123:/etc/systemd/system/snake.service
     scp snake-${CI_COMMIT_SHORT_SHA} root@45.32.186.123:/root/snakes/
 
     ssh root@45.32.186.123 'systemctl daemon-reload; systemctl stop snake.service'

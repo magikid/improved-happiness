@@ -1,10 +1,16 @@
 build:
+  image: ubuntu:noble
   stage: build
+  before_script:
+    - apt-get update && apt-get install -y just
   script:
     - just build
 
-deploy-prod:
+deploy:
+  image: ubuntu:noble
   stage: deploy
+  before_script:
+    - apt-get update && apt-get install -y just
   script:
     - just deploy
   environment: production

@@ -5,6 +5,11 @@ build:
     - apk add --no-cache just
   script:
     - just build
+  artifacts:
+    paths:
+      - snake-*
+    expire_in: "1 week"
+
 
 deploy:
   image: golang:alpine
@@ -13,7 +18,7 @@ deploy:
     - apk add --no-cache just
     - 'which ssh-agent || (apk add --no-cache openssh-client)'
     - eval $(ssh-agent -s)
-    - echo "$BATTLESNAKE_SSH_KEY" | ssh-add - > /dev/null
+    - cat "$BATTLESNAKE_SSH_KEY" | ssh-add - > /dev/null
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - ssh-keyscan -H 45.32.186.123 > ~/.ssh/known_hosts
@@ -23,3 +28,5 @@ deploy:
   environment: production
   only:
     - main
+  needs:
+    - build

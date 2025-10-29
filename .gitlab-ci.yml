@@ -1,16 +1,25 @@
 build:
-  image: ubuntu:noble
+  image: golang:alpine
   stage: build
   before_script:
-    - apt-get update && apt-get install -y just
+    - apk add --no-cache just
   script:
     - just build
 
 deploy:
-  image: ubuntu:noble
+  image: golang:alpine
   stage: deploy
   before_script:
-    - apt-get update && apt-get install -y just
+    - apk add --no-cache just
+    - 'which ssh-agent || (apk add --no-cache openssh-client)'
+    - eval $(ssh-agent -s)
+    - echo "$BATTLESNAKE_SSH_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - ssh-keyscan -H 45.32.186.123 > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
   script:
     - just deploy
   environment: production
+  only:
+    - main

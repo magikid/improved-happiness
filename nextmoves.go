@@ -1,9 +1,14 @@
 package main
 
-import "math/rand/v2"
+import (
+	"fmt"
+	"log"
+	"math/rand/v2"
+)
 
 func (mc MoveChooser) getNextMove(state GameState) BattlesnakeMoveResponse {
 	if len(mc.safeMoves) == 0 {
+		log.Printf("Ran out of safe moves %v", mc.safeMoves)
 		return BattlesnakeMoveResponse{Move: "down", Shout: "Avenge me brothers!"}
 	}
 
@@ -14,5 +19,5 @@ func (mc MoveChooser) getNextMove(state GameState) BattlesnakeMoveResponse {
 
 func getRandomMove(state MoveChooser) BattlesnakeMoveResponse {
 	nextMove := state.safeMoves[rand.IntN(len(state.safeMoves))]
-	return BattlesnakeMoveResponse{Move: nextMove}
+	return BattlesnakeMoveResponse{Move: nextMove, Shout: fmt.Sprintf("I guess I'll go %s then", nextMove)}
 }

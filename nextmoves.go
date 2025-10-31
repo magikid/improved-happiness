@@ -19,5 +19,6 @@ func (mc MoveChooser) getNextMove(state GameState) BattlesnakeMoveResponse {
 
 func getRandomMove(state MoveChooser) BattlesnakeMoveResponse {
 	nextMove := state.safeMoves[rand.IntN(len(state.safeMoves))]
+	log.Printf("Moving %s")
 	return BattlesnakeMoveResponse{Move: nextMove, Shout: fmt.Sprintf("I guess I'll go %s then", nextMove)}
 }

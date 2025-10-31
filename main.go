@@ -177,5 +177,6 @@ func move(state GameState) BattlesnakeMoveResponse {
 }
 
 func main() {
+	log.Printf("Snake starting up!")
 	RunServer()
 }

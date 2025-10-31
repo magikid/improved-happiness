@@ -170,35 +170,8 @@ func move(state GameState) BattlesnakeMoveResponse {
 	nextMove := safeMoves[rand.Intn(len(safeMoves))]
 
 	// TODO: Step 4 - Move towards food instead of random, to regain health and survive longer
-	food := state.Board.Food
-	if len(food) > 0 {
-		closestFood := food[0]
-		for _, f := range food {
-			if (myHead.X-closestFood.X)*(myHead.X-closestFood.X)+(myHead.Y-closestFood.Y)*(myHead.Y-closestFood.Y) >
-				(myHead.X-f.X)*(myHead.X-f.X)+(myHead.Y-f.Y)*(myHead.Y-f.Y) {
-				closestFood = f
-			}
-		}
-		if closestFood.X < myHead.X {
-			if isMoveSafe["left"] {
-				nextMove = "left"
-			}
-		} else if closestFood.X > myHead.X {
-			if isMoveSafe["right"] {
-				nextMove = "right"
-			}
-		} else if closestFood.Y < myHead.Y {
-			if isMoveSafe["up"] {
-				nextMove = "up"
-			}
-		} else if closestFood.Y > myHead.Y {
-			if isMoveSafe["down"] {
-				nextMove = "down"
-			}
-		}
-	}
-	// Log the move
 
+	// Log the move
 	log.Printf("MOVE %d: %s\n", state.Turn, nextMove)
 	return BattlesnakeMoveResponse{Move: nextMove}
 }
